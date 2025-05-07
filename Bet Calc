@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bet Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    input { width: 100%; padding: 5px; }
+    button { margin-top: 10px; padding: 10px 15px; }
+  </style>
+</head>
+<body>
+
+  <h1>Bet Distribution Calculator</h1>
+
+  <label>Winning Person: <input type="text" id="winnerName" placeholder="Enter winner's name"></label>
+  <button onclick="calculateWinnings()">Calculate Winnings</button>
+
+  <table id="betTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Betting On</th>
+        <th>Potential Winnings</th>
+      </tr>
+    </thead>
+    <tbody id="betTableBody">
+      <!-- Rows will be added here -->
+    </tbody>
+  </table>
+
+  <button onclick="addRow()">Add Row</button>
+
+  <script>
+    function addRow() {
+      const tbody = document.getElementById('betTableBody');
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td><input type="text" placeholder="Name"></td>
+        <td><input type="number" placeholder="Amount" min="0"></td>
+        <td><input type="text" placeholder="Betting on"></td>
+        <td class="result">-</td>
+      `;
+
+      tbody.appendChild(row);
+    }
+
+    function calculateWinnings() {
+      const winner = document.getElementById('winnerName').value.trim().toLowerCase();
+      const rows = document.querySelectorAll('#betTableBody tr');
+
+      let totalPot = 0;
+      let winnerTotal = 0;
+
+      // First, calculate the total pot and winner-only bet total
+      rows.forEach(row => {
+        const amount = parseFloat(row.cells[1].querySelector('input').value) || 0;
+        const betOn = row.cells[2].querySelector('input').value.trim().toLowerCase();
+
+        totalPot += amount;
+
+        if (betOn === winner) {
+          winnerTotal += amount;
+        }
+      });
+
+      // Now assign winnings
+      rows.forEach(row => {
+        const amount = parseFloat(row.cells[1].querySelector('input').value) || 0;
+        const betOn = row.cells[2].querySelector('input').value.trim().toLowerCase();
+        const resultCell = row.cells[3];
+
+        if (betOn === winner && winnerTotal > 0) {
+          const share = totalPot * (amount / winnerTotal);
+          resultCell.textContent = `$${share.toFixed(2)}`;
+        } else {
+          resultCell.textContent = '$0.00';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
+
